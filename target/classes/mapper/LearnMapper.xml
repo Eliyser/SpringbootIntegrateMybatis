@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--为指定接口中的方法配置sql语句-->
+<mapper namespace="com.dudu.dao.LearnMapperWithXml"> <!--指定接口-->
+    <resultMap id="LearnResource" type="com.dudu.domain.LearnResource"> <!--一定要用完整路径-->
+        <id column="id" property="id"/>
+        <result column="author" property="author"/>
+        <result column="title" property="title"/>
+        <result column="url" property="url"/>
+    </resultMap>
+
+    <select id="queryLearnResourceList" resultMap="LearnResource" parameterType="hashmap"> <!--大小写不分-->
+        select * from learn_resource
+        <where>
+            <if test="author!=null and author !=''">
+                and author like '%${author}%' <!--like的话是%${author}%而不是%#{author}%-->
+            </if>
+            <if test="title!=null and title!=''">
+                and title like '%${title}%'
+            </if>
+        </where>
+    </select>
+
+    <select id="queryLearnResourceById" resultMap="LearnResource" parameterType="Long">
+        select * from learn_resource where id=#{id}
+    </select>
+
+    <insert id="add" parameterType="com.dudu.domain.LearnResource">
+        insert into learn_resource values(#{id},#{author},#{title},#{url})
+    </insert>
+
+    <update id="update" parameterType="com.dudu.domain.LearnResource">
+        update learn_resource set author=#{author},title=#{title},url=#{url} where id=#{id}
+    </update>
+
+    <delete id="deleteByIds" parameterType="String">
+        delete from learn_resource where id in
+        <foreach collection="params" item="idItem" open="(" separator="," close=")">
+            #{idItem}
+        </foreach>
+    </delete>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
