@@ -102,6 +102,7 @@ public class ServletUtil {
         try { //必须try/catch，不能抛出，因为要保证资源被关闭
 
             printWriter = response.getWriter();
+            //如果result为空，那么客户端打印空白；不能抛出异常，因为抛出了就需要生成错误报文，不要为这种几乎不可能的异常浪费controller的代码
             if (null != result) {
                 if (null != filter) { //是否定制序列化
                     jsonString = JSONObject.toJSONString(result, filter, serializerFeature); //result是接收到的对象
@@ -117,7 +118,8 @@ public class ServletUtil {
             printWriter.flush();
 
         } catch (IOException e) {
-            e.printStackTrace(); //更妥善的处理：throw new IOException();
+            logger.error("CreateResponse failed", e);
+            //不用再抛出，因为抛出了就要再生成一次报文，但既然getWrite都出错了生成的报文又怎么打印到前端呢
         } finally {
             if (null != printWriter) {
                 printWriter.close();
@@ -164,7 +166,7 @@ public class ServletUtil {
             }
             printWriter.flush();
         } catch (IOException e) {
-            logger.error("CreateResponse failed", e); //throw new IOException
+            logger.error("CreateResponse failed", e);
         } finally {
             if (null != printWriter) {
                 printWriter.close();
@@ -205,7 +207,7 @@ public class ServletUtil {
         try {
             printWriter = response.getWriter();
             Map<String, Object> map = new HashMap<String, Object>();
-            map.put("code", code);
+            map.put("code", code);//不要管这些参数是否为空，空的话客户端显示很多空信息也没事，但处理成抛异常的话又要生成一遍错误报文
             map.put("message", message);
             map.put("server_time", DateUtil.formatAsDatetime(new Date()));
             printWriter.write(jsonString);
